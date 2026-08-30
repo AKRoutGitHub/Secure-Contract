@@ -1,0 +1,48 @@
+# Node.js / Express Backend
+node_modules/
+npm-debug.log*
+dist/
+
+# Environment Variables & Security (Claude AI, Etherscan API Keys)
+.env
+.env.local
+.env.test
+.env.production
+
+# Python / AI Workers (Slither, GNN)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Foundry / Solidity (Forge Worker)
+out/
+cache/
+artifacts/
+broadcast/
+snapshots/
+
+# Dynamically Fetched Target Contracts
+contracts/*.sol
+!contracts/.gitkeep
+
+# Application Logs & Process IDs
+logs/
+*.log
+*.pid
+pids/
+
+# Local Databases (PostgreSQL, Neo4j, Redis)
+pgdata/
+neo4j_data/
+redis_data/
+
+# OS / IDEs / System Junk
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.tgz
+*.zip
