@@ -1,69 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Secure-Contract Pipeline</title>
-</head>
-<body>
+  </head>
+  <body>
     <h2>Start Security Audit</h2>
-    
+
     <form id="scanForm">
-        <div>
-            <label for="address">Ethereum Contract Address:</label>
-            <input type="text" id="address" name="address" placeholder="0xdAC17F... ">
-        </div>
-        
-        <p><strong>OR</strong></p>
-        
-        <div>
-            <label for="contractFile">Upload .sol File:</label>
-            <input type="file" id="contractFile" name="contractFile" accept=".sol">
-        </div>
-        
-        <br>
-        <button type="submit">Submit</button>
+      <div>
+        <label for="address">Ethereum Contract Address:</label>
+        <input
+          type="text"
+          id="address"
+          name="address"
+          placeholder="0xdAC17F... "
+        />
+      </div>
+
+      <p><strong>OR</strong></p>
+
+      <div>
+        <label for="contractFile">Upload .sol File:</label>
+        <input
+          type="file"
+          id="contractFile"
+          name="contractFile"
+          accept=".sol"
+        />
+      </div>
+
+      <br />
+      <button type="submit">Submit</button>
     </form>
 
-    <div id="output" style="margin-top: 20px; padding: 10px; background: #f4f4f4; white-space: pre-wrap; font-family: monospace;"></div>
+    <div
+      id="output"
+      style="
+        margin-top: 20px;
+        padding: 10px;
+        background: #f4f4f4;
+        white-space: pre-wrap;
+        font-family: monospace;
+      "
+    ></div>
 
     <script>
-        document.getElementById('scanForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const addressInput = document.getElementById('address').value;
-            const fileInput = document.getElementById('contractFile').files[0];
-            const outputDiv = document.getElementById('output');
-            
-            outputDiv.textContent = 'Processing request...';
+      document
+        .getElementById("scanForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-            // FormData natively handles multipart/form-data requirements for file uploads
-            const formData = new FormData();
-            
-            // Prioritize the file if both are accidentally filled out
-            if (fileInput) {
-                formData.append('contractFile', fileInput);
-            } else if (addressInput) {
-                formData.append('address', addressInput);
-            } else {
-                outputDiv.textContent = 'Error: Please provide a contract address or upload a file.';
-                return;
-            }
+          const addressInput = document.getElementById("address").value;
+          const fileInput = document.getElementById("contractFile").files[0];
+          const outputDiv = document.getElementById("output");
 
-            try {
-                // The browser automatically sets the correct Content-Type with the boundary string when passing FormData
-                const response = await fetch('/api/scan', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                outputDiv.textContent = JSON.stringify(result, null, 2);
-                
-            } catch (error) {
-                outputDiv.textContent = 'Network Error: ' + error.message;
-            }
+          outputDiv.textContent = "Processing request...";
+
+          // FormData natively handles multipart/form-data requirements for file uploads
+          const formData = new FormData();
+
+          // Prioritize the file if both are accidentally filled out
+          if (fileInput) {
+            formData.append("contractFile", fileInput);
+          } else if (addressInput) {
+            formData.append("address", addressInput);
+          } else {
+            outputDiv.textContent =
+              "Error: Please provide a contract address or upload a file.";
+            return;
+          }
+
+          try {
+            // The browser automatically sets the correct Content-Type with the boundary string when passing FormData
+            const response = await fetch("/api/scan", {
+              method: "POST",
+              body: formData,
+            });
+
+            const result = await response.json();
+            outputDiv.textContent = JSON.stringify(result, null, 2);
+          } catch (error) {
+            outputDiv.textContent = "Network Error: " + error.message;
+          }
         });
     </script>
-</body>
+  </body>
 </html>
