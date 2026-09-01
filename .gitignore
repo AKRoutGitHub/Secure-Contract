@@ -25,7 +25,7 @@ broadcast/
 snapshots/
 
 # Dynamically Fetched Target Contracts
-contracts/*.sol
+contracts/**/*.sol
 !contracts/.gitkeep
 
 # Application Logs & Process IDs
