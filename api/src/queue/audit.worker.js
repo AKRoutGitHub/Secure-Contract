@@ -5,19 +5,46 @@ const connection = {
   port: Number(process.env.REDIS_PORT || 6379),
 };
 
+const { runSlither } = require("../engines/slither/slither.worker");
+const { parseSlitherOutput } = require("../engines/slither/slither.parser");
+const { createFinding } = require("../models/finding.model");
+
 const worker = new Worker(
   "audit-analysis",
   async (job) => {
+    const { auditId, artifactPath } = job.data;
+
     console.log("=================================");
-    console.log("Audit job received");
-    console.log("Job ID:", job.id);
-    console.log("Audit ID:", job.data.auditId);
-    console.log("Artifact:", job.data.artifactPath);
+    console.log("Starting Slither");
+    console.log("Audit ID:", auditId);
+    console.log("Artifact:", artifactPath);
     console.log("=================================");
 
+    const slitherOutput = await runSlither(artifactPath);
+
+    const findings = parseSlitherOutput(slitherOutput);
+
+    for (const finding of findings) {
+      await createFinding({
+        auditId,
+        engine: "slither",
+        type: finding.type,
+        severity: finding.severity,
+        confidence: finding.confidence,
+        title: finding.title,
+        description: finding.description,
+        location: finding.location,
+        evidence: finding.evidence,
+        recommendation: finding.recommendation,
+      });
+    }
+
+    console.log(`Slither completed: ${findings.length} findings`);
+
     return {
-      auditId: job.data.auditId,
-      status: "received",
+      auditId,
+      engine: "slither",
+      findingCount: findings.length,
     };
   },
   {
@@ -25,8 +52,9 @@ const worker = new Worker(
   },
 );
 
-worker.on("completed", (job) => {
+worker.on("completed", (job, result) => {
   console.log(`Audit job completed: ${job.id}`);
+  console.log(result);
 });
 
 worker.on("failed", (job, error) => {
