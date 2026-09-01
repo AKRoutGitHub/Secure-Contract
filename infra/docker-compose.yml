@@ -13,6 +13,10 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-
+  redis:
+    image: redis:7
+    container_name: secure-contract-redis
+    ports:
+      - "6379:6379"
 volumes:
   pgdata:
