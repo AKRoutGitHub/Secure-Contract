@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Secure-Contract Pipeline</title>
   </head>
+
   <body>
     <h2>Start Security Audit</h2>
 
@@ -15,7 +16,7 @@
           type="text"
           id="address"
           name="address"
-          placeholder="0xdAC17F... "
+          placeholder="0xdAC17F..."
           pattern="^0x[a-fA-F0-9]{40}$"
           title="Enter a valid Ethereum address"
         />
@@ -34,8 +35,26 @@
       </div>
 
       <br />
+
       <button type="submit">Submit</button>
     </form>
+
+    <!-- Processing dashboard -->
+    <div id="processingState" hidden>
+      <h2>Audit in Progress</h2>
+
+      <p>Your smart contract is being analyzed for security vulnerabilities.</p>
+
+      <p>
+        Status:
+        <strong>Processing...</strong>
+      </p>
+
+      <p>
+        Audit ID:
+        <code id="processingAuditId"></code>
+      </p>
+    </div>
 
     <div
       id="output"
@@ -49,6 +68,19 @@
     ></div>
 
     <script>
+      function showProcessingState(auditId) {
+        const form = document.getElementById("scanForm");
+        const processingState = document.getElementById("processingState");
+        const processingAuditId = document.getElementById("processingAuditId");
+        const outputDiv = document.getElementById("output");
+
+        form.hidden = true;
+        outputDiv.hidden = true;
+
+        processingAuditId.textContent = auditId;
+        processingState.hidden = false;
+      }
+
       document
         .getElementById("scanForm")
         .addEventListener("submit", async (e) => {
@@ -60,12 +92,12 @@
 
           const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
 
+          outputDiv.hidden = false;
           outputDiv.textContent = "Processing request...";
 
-          // FormData natively handles multipart/form-data requirements for file uploads
           const formData = new FormData();
 
-          // Prioritize the file if both are accidentally filled out
+          // Prioritize the file if both are filled out
           if (fileInput) {
             formData.append("contractFile", fileInput);
           } else if (addressInput) {
@@ -83,13 +115,18 @@
           }
 
           try {
-            // The browser automatically sets the correct Content-Type with the boundary string when passing FormData
             const response = await fetch("/api/audits", {
               method: "POST",
               body: formData,
             });
 
             const result = await response.json();
+
+            if (response.ok) {
+              showProcessingState(result.audit_id);
+              return;
+            }
+
             outputDiv.textContent = JSON.stringify(result, null, 2);
           } catch (error) {
             outputDiv.textContent = "Network Error: " + error.message;
