@@ -3,7 +3,7 @@ const { randomUUID } = require("crypto");
 const { createAudit, getAuditById } = require("../models/audit.model");
 
 const { getEngineRunsByAuditId } = require("../models/engine-run.model");
-
+const { getFindingsByAuditId } = require("../models/finding.model");
 const {
   saveUploadedContract,
   fetchContractFromAddress,
@@ -59,12 +59,13 @@ const getAuditService = async (auditId) => {
   if (!audit) {
     return null;
   }
-
   const engineRuns = await getEngineRunsByAuditId(auditId);
+  const findings = await getFindingsByAuditId(auditId);
 
   return {
     audit,
     engineRuns,
+    findings,
   };
 };
 

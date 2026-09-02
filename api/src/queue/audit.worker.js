@@ -8,6 +8,7 @@ const connection = {
 const { runSlither } = require("../engines/slither/slither.worker");
 const { parseSlitherOutput } = require("../engines/slither/slither.parser");
 const { createFinding } = require("../models/finding.model");
+const { updateAuditStatus } = require("../models/audit.model");
 
 const worker = new Worker(
   "audit-analysis",
@@ -40,6 +41,8 @@ const worker = new Worker(
     }
 
     console.log(`Slither completed: ${findings.length} findings`);
+
+    await updateAuditStatus(auditId, "completed");
 
     return {
       auditId,

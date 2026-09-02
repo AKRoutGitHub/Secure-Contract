@@ -3,82 +3,538 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Secure-Contract Pipeline</title>
+    <title>Secure Contract</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+        padding: 40px 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .header h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+      }
+
+      .header p {
+        margin: 0;
+        color: #94a3b8;
+      }
+
+      .card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 14px;
+        padding: 28px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      }
+
+      .field {
+        margin-bottom: 22px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      input[type="text"],
+      input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #60a5fa;
+      }
+
+      .or {
+        text-align: center;
+        color: #64748b;
+        margin: 18px 0;
+      }
+
+      button {
+        width: 100%;
+        padding: 13px;
+        border: 0;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #1d4ed8;
+      }
+
+      .processing {
+        text-align: center;
+      }
+
+      .status {
+        display: inline-block;
+        margin: 20px 0;
+        padding: 8px 14px;
+        border-radius: 20px;
+        background: #422006;
+        color: #fbbf24;
+        font-weight: 600;
+      }
+
+      .completed-status {
+        background: #052e16;
+        color: #4ade80;
+      }
+
+      .audit-id {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 14px;
+        word-break: break-all;
+        font-family: monospace;
+        color: #93c5fd;
+      }
+
+      .results {
+        margin-top: 20px;
+      }
+
+      .results h2 {
+        margin-top: 0;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin: 24px 0;
+      }
+
+      .summary-card {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 18px;
+        text-align: center;
+      }
+
+      .summary-card .number {
+        display: block;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 6px;
+      }
+
+      .summary-card .label {
+        display: block;
+        color: #94a3b8;
+        font-size: 13px;
+      }
+
+      .findings-header {
+        margin-top: 30px;
+        margin-bottom: 14px;
+      }
+
+      .finding {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 12px;
+      }
+
+      .finding-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .finding-title strong {
+        font-size: 16px;
+      }
+
+      .severity {
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .severity-high,
+      .severity-critical {
+        background: #450a0a;
+        color: #fca5a5;
+      }
+
+      .severity-medium {
+        background: #422006;
+        color: #fbbf24;
+      }
+
+      .severity-low {
+        background: #172554;
+        color: #93c5fd;
+      }
+
+      .severity-informational,
+      .severity-info {
+        background: #1e293b;
+        color: #cbd5e1;
+      }
+
+      .finding-type {
+        color: #60a5fa;
+        font-family: monospace;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .finding-description {
+        color: #cbd5e1;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
+      .finding-meta {
+        margin-top: 12px;
+        color: #64748b;
+        font-size: 12px;
+      }
+
+      .empty {
+        padding: 20px;
+        text-align: center;
+        color: #94a3b8;
+        background: #0f172a;
+        border-radius: 8px;
+      }
+
+      .error {
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #450a0a;
+        color: #fca5a5;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 700px) {
+        .summary {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .finding-title {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+    </style>
   </head>
 
   <body>
-    <h2>Start Security Audit</h2>
-
-    <form id="scanForm">
-      <div>
-        <label for="address">Ethereum Contract Address:</label>
-        <input
-          type="text"
-          id="address"
-          name="address"
-          placeholder="0xdAC17F..."
-          pattern="^0x[a-fA-F0-9]{40}$"
-          title="Enter a valid Ethereum address"
-        />
+    <div class="container">
+      <div class="header">
+        <h1>Secure Contract</h1>
+        <p>Smart contract security analysis</p>
       </div>
 
-      <p><strong>OR</strong></p>
+      <div class="card">
+        <!-- Audit form -->
+        <form id="scanForm">
+          <div class="field">
+            <label for="address">Ethereum Contract Address</label>
 
-      <div>
-        <label for="contractFile">Upload .sol File:</label>
-        <input
-          type="file"
-          id="contractFile"
-          name="contractFile"
-          accept=".sol"
-        />
+            <input
+              type="text"
+              id="address"
+              name="address"
+              placeholder="0xdAC17F958D2ee523a2206206994597C13D831ec7"
+              pattern="^0x[a-fA-F0-9]{40}$"
+              title="Enter a valid Ethereum address"
+            />
+          </div>
+
+          <div class="or">
+            <strong>OR</strong>
+          </div>
+
+          <div class="field">
+            <label for="contractFile">Upload Solidity Contract</label>
+
+            <input
+              type="file"
+              id="contractFile"
+              name="contractFile"
+              accept=".sol"
+            />
+          </div>
+
+          <button type="submit">Start Security Audit</button>
+        </form>
+
+        <!-- Processing -->
+        <div id="processingState" class="processing" hidden>
+          <h2>Audit in Progress</h2>
+
+          <p>
+            Your smart contract is being analyzed for security vulnerabilities.
+          </p>
+
+          <div class="status">● Processing...</div>
+
+          <p>Audit ID</p>
+
+          <div id="processingAuditId" class="audit-id"></div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="results" hidden>
+          <h2>Audit Results</h2>
+
+          <div class="status completed-status">● Audit Completed</div>
+
+          <p><strong>Audit ID</strong></p>
+
+          <div id="resultsAuditId" class="audit-id"></div>
+
+          <div class="summary">
+            <div class="summary-card">
+              <span id="totalFindings" class="number">0</span>
+              <span class="label">Total Findings</span>
+            </div>
+
+            <div class="summary-card">
+              <span id="highFindings" class="number">0</span>
+              <span class="label">High / Critical</span>
+            </div>
+
+            <div class="summary-card">
+              <span id="mediumFindings" class="number">0</span>
+              <span class="label">Medium</span>
+            </div>
+
+            <div class="summary-card">
+              <span id="lowFindings" class="number">0</span>
+              <span class="label">Low / Info</span>
+            </div>
+          </div>
+
+          <div class="findings-header">
+            <h2>Security Findings</h2>
+          </div>
+
+          <div id="findingsList"></div>
+        </div>
+
+        <div id="output" hidden></div>
       </div>
-
-      <br />
-
-      <button type="submit">Submit</button>
-    </form>
-
-    <!-- Processing dashboard -->
-    <div id="processingState" hidden>
-      <h2>Audit in Progress</h2>
-
-      <p>Your smart contract is being analyzed for security vulnerabilities.</p>
-
-      <p>
-        Status:
-        <strong>Processing...</strong>
-      </p>
-
-      <p>
-        Audit ID:
-        <code id="processingAuditId"></code>
-      </p>
     </div>
 
-    <div
-      id="output"
-      style="
-        margin-top: 20px;
-        padding: 10px;
-        background: #f4f4f4;
-        white-space: pre-wrap;
-        font-family: monospace;
-      "
-    ></div>
-
     <script>
+      const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+
       function showProcessingState(auditId) {
         const form = document.getElementById("scanForm");
         const processingState = document.getElementById("processingState");
         const processingAuditId = document.getElementById("processingAuditId");
-        const outputDiv = document.getElementById("output");
 
         form.hidden = true;
-        outputDiv.hidden = true;
-
         processingAuditId.textContent = auditId;
         processingState.hidden = false;
+      }
+
+      function showError(message) {
+        const outputDiv = document.getElementById("output");
+
+        outputDiv.hidden = false;
+        outputDiv.className = "error";
+        outputDiv.textContent = "Error: " + message;
+      }
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) {
+          return "";
+        }
+
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function getSeverityClass(severity) {
+        const normalized = String(severity || "informational")
+          .toLowerCase()
+          .replace(/\s+/g, "-");
+
+        return `severity-${normalized}`;
+      }
+
+      function getLocation(finding) {
+        const lines =
+          finding.location &&
+          finding.location.source &&
+          finding.location.source.lines;
+
+        if (!lines || lines.length === 0) {
+          return "";
+        }
+
+        return `Line ${lines.join(", ")}`;
+      }
+
+      function showResults(result) {
+        const processingState = document.getElementById("processingState");
+        const results = document.getElementById("results");
+
+        const findings = Array.isArray(result.findings) ? result.findings : [];
+
+        processingState.hidden = true;
+        results.hidden = false;
+
+        document.getElementById("resultsAuditId").textContent =
+          result.audit.audit_id;
+
+        const total = findings.length;
+
+        const highCritical = findings.filter((finding) => {
+          const severity = String(finding.severity || "").toLowerCase();
+          return severity === "high" || severity === "critical";
+        }).length;
+
+        const medium = findings.filter((finding) => {
+          return String(finding.severity || "").toLowerCase() === "medium";
+        }).length;
+
+        const lowInfo = findings.filter((finding) => {
+          const severity = String(finding.severity || "").toLowerCase();
+
+          return (
+            severity === "low" ||
+            severity === "informational" ||
+            severity === "info"
+          );
+        }).length;
+
+        document.getElementById("totalFindings").textContent = total;
+        document.getElementById("highFindings").textContent = highCritical;
+        document.getElementById("mediumFindings").textContent = medium;
+        document.getElementById("lowFindings").textContent = lowInfo;
+
+        const findingsList = document.getElementById("findingsList");
+
+        if (findings.length === 0) {
+          findingsList.innerHTML = `
+            <div class="empty">
+              No security findings were detected.
+            </div>
+          `;
+
+          return;
+        }
+
+        findingsList.innerHTML = findings
+          .map((finding, index) => {
+            const severity = String(
+              finding.severity || "informational",
+            ).toLowerCase();
+
+            const location = getLocation(finding);
+
+            return `
+              <div class="finding">
+                <div class="finding-title">
+                  <strong>
+                    ${index + 1}. ${escapeHtml(finding.title || "Security Finding")}
+                  </strong>
+
+                  <span class="severity ${getSeverityClass(severity)}">
+                    ${escapeHtml(severity)}
+                  </span>
+                </div>
+
+                <div class="finding-type">
+                  ${escapeHtml(finding.type || "unknown")}
+                </div>
+
+                <div class="finding-description">
+                  ${escapeHtml(
+                    finding.description || "No description available.",
+                  )}
+                </div>
+
+                <div class="finding-meta">
+                  Engine: ${escapeHtml(finding.engine || "unknown")}
+                  ${location ? ` · ${escapeHtml(location)}` : ""}
+                  ${
+                    finding.confidence
+                      ? ` · Confidence: ${escapeHtml(finding.confidence)}`
+                      : ""
+                  }
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      async function checkAuditStatus(auditId) {
+        try {
+          const response = await fetch(`/api/audits/${auditId}`);
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || "Unable to check audit status.");
+          }
+
+          if (result.audit.status === "completed") {
+            showResults(result);
+            return;
+          }
+
+          setTimeout(() => checkAuditStatus(auditId), 2000);
+        } catch (error) {
+          showError(error.message);
+        }
       }
 
       document
@@ -86,31 +542,25 @@
         .addEventListener("submit", async (e) => {
           e.preventDefault();
 
-          const addressInput = document.getElementById("address").value;
+          const addressInput = document.getElementById("address").value.trim();
+
           const fileInput = document.getElementById("contractFile").files[0];
-          const outputDiv = document.getElementById("output");
-
-          const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
-
-          outputDiv.hidden = false;
-          outputDiv.textContent = "Processing request...";
 
           const formData = new FormData();
 
-          // Prioritize the file if both are filled out
           if (fileInput) {
             formData.append("contractFile", fileInput);
           } else if (addressInput) {
-            if (!ethereumAddressRegex.test(addressInput.trim())) {
-              outputDiv.textContent =
-                "Error: Please enter a valid Ethereum contract address.";
+            if (!ethereumAddressRegex.test(addressInput)) {
+              showError("Please enter a valid Ethereum contract address.");
               return;
             }
 
-            formData.append("address", addressInput.trim());
+            formData.append("address", addressInput);
           } else {
-            outputDiv.textContent =
-              "Error: Please provide a contract address or upload a file.";
+            showError(
+              "Please provide a contract address or upload a Solidity file.",
+            );
             return;
           }
 
@@ -122,14 +572,16 @@
 
             const result = await response.json();
 
-            if (response.ok) {
-              showProcessingState(result.audit_id);
+            if (!response.ok) {
+              showError(result.error || "Failed to start the security audit.");
               return;
             }
 
-            outputDiv.textContent = JSON.stringify(result, null, 2);
+            showProcessingState(result.audit_id);
+
+            checkAuditStatus(result.audit_id);
           } catch (error) {
-            outputDiv.textContent = "Network Error: " + error.message;
+            showError("Network Error: " + error.message);
           }
         });
     </script>

@@ -40,7 +40,8 @@ const getAudit = async (req, res) => {
 
     return res.status(200).json({
       audit: result.audit,
-      engines: result.engineRuns,
+      engines: result.engineRuns || [],
+      findings: result.findings || [],
     });
   } catch (error) {
     console.error("Error retrieving audit:", error);

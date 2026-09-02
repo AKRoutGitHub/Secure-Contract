@@ -54,6 +54,20 @@ const createFinding = async ({
   return result.rows[0];
 };
 
+const getFindingsByAuditId = async (auditId) => {
+  const query = `
+    SELECT *
+    FROM findings
+    WHERE audit_id = $1
+    ORDER BY created_at ASC;
+  `;
+
+  const result = await db.query(query, [auditId]);
+
+  return result.rows;
+};
+
 module.exports = {
   createFinding,
+  getFindingsByAuditId,
 };

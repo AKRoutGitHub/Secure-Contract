@@ -47,7 +47,26 @@ const getAuditById = async (auditId) => {
   return result.rows[0] || null;
 };
 
+const updateAuditStatus = async (auditId, status) => {
+  const query = `
+        UPDATE audits
+        SET
+            status = $2::varchar,
+            completed_at = CASE
+                WHEN $2::varchar = 'completed' THEN NOW()
+                ELSE completed_at
+            END
+        WHERE audit_id = $1
+        RETURNING *;
+    `;
+
+  const result = await db.query(query, [auditId, status]);
+
+  return result.rows[0] || null;
+};
+
 module.exports = {
   createAudit,
   getAuditById,
+  updateAuditStatus,
 };
