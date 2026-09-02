@@ -16,6 +16,8 @@
           id="address"
           name="address"
           placeholder="0xdAC17F... "
+          pattern="^0x[a-fA-F0-9]{40}$"
+          title="Enter a valid Ethereum address"
         />
       </div>
 
@@ -56,6 +58,8 @@
           const fileInput = document.getElementById("contractFile").files[0];
           const outputDiv = document.getElementById("output");
 
+          const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+
           outputDiv.textContent = "Processing request...";
 
           // FormData natively handles multipart/form-data requirements for file uploads
@@ -65,7 +69,13 @@
           if (fileInput) {
             formData.append("contractFile", fileInput);
           } else if (addressInput) {
-            formData.append("address", addressInput);
+            if (!ethereumAddressRegex.test(addressInput.trim())) {
+              outputDiv.textContent =
+                "Error: Please enter a valid Ethereum contract address.";
+              return;
+            }
+
+            formData.append("address", addressInput.trim());
           } else {
             outputDiv.textContent =
               "Error: Please provide a contract address or upload a file.";
@@ -74,7 +84,7 @@
 
           try {
             // The browser automatically sets the correct Content-Type with the boundary string when passing FormData
-            const response = await fetch("/api/scan", {
+            const response = await fetch("/api/audits", {
               method: "POST",
               body: formData,
             });
